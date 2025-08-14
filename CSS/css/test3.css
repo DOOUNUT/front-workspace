@@ -1,0 +1,72 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+header {
+    background-color: blue;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+.search {
+    width: 50%;
+    padding: 10;
+}
+main {
+    flex: 1;
+    display: flex;
+    padding: 0.5rem; /* 전체 간격을 조금 줄임 */
+}
+.products {
+    flex: 3;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 0.3rem; /* 가로 간격 */
+    row-gap: 0e;    /* 세로 간격을 더 좁게 */
+    margin-left: 5rem;
+    margin-right: 3rem;
+    margin-top: 3rem;
+}
+
+.product {
+    background-color: #eee;
+    padding: 10px;
+    text-align: center;
+    height: 380px; /* 살짝 줄임 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+p{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100px;
+}
+.cart {
+    flex: 1;
+    margin-left: 1rem; /* 오른쪽 장바구니와 상품 간 간격 */
+    background-color: aqua;
+    padding: 10px;
+    height: auto;
+    text-align: center;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+.but{
+    background-color: darkkhaki;
+    border-radius: 5px;
+    width: 150px;
+}

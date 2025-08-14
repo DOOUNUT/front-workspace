@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Object</h1>
+    <h2>객체 생성</h2>
+    <input type="button" value="실행" onclick="test1()">
+    <script>
+        /*
+            속성명: 속성값으로 구성된 요소를 관리하는 객체
+             - 속성명 : 식별자의 역할을 하며 문자열 혹은 정수값으로 작성 가능
+             - 속성값 : 모든 타입 가능.
+        */
+        function test1() {
+            const obj1 = {
+                name: "홍길동",
+                age: 33,
+                married: true,
+                hobby: ['축구', '농구', '야구'],
+                pet: {
+                    name: '둘리',
+                    bread: '공룡'
+                },
+                123: 456,
+                "foo-bar": '하이'
+            }
+            const obj2 = new Object();
+            obj2.pname = '말린 망고';
+            obj2.price = 3000;
+            //객체 내부 속성에 접근하는 방법
+            // 1) 점 표기법(dot notation)
+            // 2) 대괄호 표기법(bracket notation)
+            // - 리터럴값 혹은 값을 저장한 변수를 제시
+            obj2["origin"] = '필리핀';
+            obj2["ty-pe"] = "건망고";
+            //obj2.ty-pe = "건망고";//특수문자 혹은 띄어쓰기가 포함된 경우 반드시 대괄호 표기법 사용
+
+            console.log(obj2)
+            console.log(obj2.pname)
+            console.log(obj2["pname"])
+
+        }
+    </script>
+    <h2>메서드</h2>
+    <input type="button" value="실행" onclick="test2()">
+    <script>
+        function test2() {
+            //자바에서는 class안에 선언한 함수를 메서드.
+            //자바스크립트 에서는 객체 안에 서넌한 함수를 메서드라고 부름
+            const pet = {
+                petName: "코코",
+                eat: function (food) {
+                    console.log(this.petName + "가" + food + "맛있게 먹는다")
+                }
+            }
+            console.log(pet);
+            pet.eat('츄르')
+        }
+    </script>
+    <h2>속성 순회 | 동적 제어</h2>
+    <input type="button" value="실행" onclick="test3();">
+    <input type="button" value="게임종료" onclick="test4();">
+    <input type="button" value="동적제어" onclick="test5();">
+    <input type="button" value="toString" onclick="test6();">
+    <script>
+        let game;
+        function test3() {
+            game = {
+                title: 'DIABLO4',
+                price: 35000,
+                lang: ['ko', 'en', 'cn'],
+                run : function(){
+                    console.log(this.title+"을 실행합니다...")
+                    this["start-time"] = new Date();
+                },
+                shutdown : function(){
+                    console.log(this.title+"을 종료합니다")
+                    //종료시간 기록
+                    this["end-time"] =new Date();
+                },
+                duration : function(){
+                    let dur = (this["end-time"]-this["start-time"])
+                    dur = Math.floor(dur * 10)/10;
+                    console.log(dur+"동안 게임")
+                }
+            }
+        }
+        function test4(){
+           
+        }
+        function test5(){
+            const student = {};
+            student.name = "홍길동";
+            student["class"] ="G"
+            student["no"] =33;
+
+            //속성 제거
+            delete student.no;
+            delete student["class"];
+
+            console.log(student);
+        }
+        function test6(){
+            /*
+                toString메서드 오버라이딩
+                 - 자바스크립트는 모든 객체가 object 상속받음.
+            */
+           const notebook = {
+            title:'오늘의 일기',
+            content : '오늘은 성겸이가 지각을 했다',
+            date : new Date(),
+            toString : function(){
+                let str = " ";
+                for(let key in this){
+                    key != "toString" &&
+                    (str += "key : "+key+" , vlaue : "+this[key])
+                }
+                return str;
+            }
+           }
+           console.log(notebook);
+           console.log(notebook.toString());
+        }
+    </script>
+    <h2>객체배열</h2>
+    <input type="button" value="실행" onclick="test7()">
+    <script>
+        function test7(){
+            const pets = [
+
+                {
+                    name : "꽃분이",
+                    breed : "말티즈",
+                    weight: 4.5,
+                    bark : function(){
+                        return this.weight>10?"멍멍":"왈왈";
+                    }   
+                },
+                {
+                    name : "아랑",
+                    breed : "비숑",
+                    weight: 9,
+                    bark : function(){
+                        return this.weight>10?"멍멍":"왈왈";
+                    }   
+                },
+                {
+                    name : "옥지",
+                    breed : "시바",
+                    weight: 11,
+                    bark : function(){
+                        return this.weight>10?"멍멍":"왈왈";
+                    }   
+                }
+            ]
+            console.log(pets);
+
+            for(const pet of pets){
+                console.log(pet.name+"이/가"+pet.bark()+"짖는다")
+            }
+        }
+    </script>
+    <h2>생성자 함수 & Prototype</h2>
+    <input type="button" value="실행" onclick="test8()">
+    <input type="button" value="실행" onclick="test9()">
+    <script>
+        /*
+            생성자 함수
+             - 자스에서 객체지향 프로그래밍을 지원하는 핵심 기능
+             - 클래스를 정의하기 위한 용도의 함수.생성자 함수로 만든 함수는 new 연산자를
+               함께 사용해서 호출해야 한다.
+             - 생성자 함수는 첫 글자를 클래스 처럼 대문자로 작성하는 것이 관례
+             - 모든 함수는 보이지 않는 prototype이라는 속성을 가지고 있으며,
+               이 prototype을 통해 상속을 지원한다.
+            prototype
+             - 함수 정의시 prototype에는 부모객체가 생성되어 저장된다.
+               (부모객체 미 정의시에는 object 객체가 생성되어 저장된다.)
+        */
+       function Pet(kind,name,breed,weight){
+        //필드부
+        // - 생성자 함수 내부에서 this는 현재 생성된 객체의 주소값을 의미
+        this.kind=kind
+        this.name=name;
+        this.breed=breed;
+        this.weight=weight;
+        //생성자부
+        //constructor -> class 예약어에서 사용 가능
+        //메서드부
+        //this.bark = function(){
+          //  return this.weight>10 ?'멍멍':'왈왈'
+        //}
+        // 현재 클래스의 부모객체에 속성/메서드를 추가하는 방법
+        // pet객체가 가지는 공통적인 속성/메서드를 노출시키지 않고자 할때 사용
+        Pet.prototype.bark=function(){
+            return this.weight >10 ? '멍멍':'왈왈'
+        }
+       }
+       function test8(){
+        const coco = new pet("고양이","코코",'브숏',3)
+        console.log(coco);
+        console.log(coco.bark());
+
+       }
+    </script>
+    <h2>자바스크립트 Class</h2>
+    <input type="button" value="실행" onclick="test9()">
+    <script>
+        //부모 클래스
+        class Animal{
+            kind;
+            constructor(kind){
+                this.kind = kind;
+            }
+        }
+        //자식클래스
+        class Pet2 extends Animal{
+            name;
+            breed;
+            weight;
+
+            constructor(name,breed,weight){
+                super(kind)
+                this.name=name;
+                this.breed=breed;
+                this,weight=weight;
+            }
+            //메서드부
+            //get/setter
+            //hobby에 값을 추가하는 setter메서드
+            
+        }
+        function test9(){
+            const cat = new Pet2('코코','브숏',3);
+            console.log(cat);
+        }
+    </script>
+</body>
+
+</html>
