@@ -12,7 +12,7 @@ function BoardSearch({list}: {list: typeof boardList}) {
   //  - useState나 useRef를 활용하여 검색어를 관리하는 변수를 선언하세요. 
   //  - 단, 뭐가 더 효율적인지 생각한 후 작업하세요.
 
-  const keywordRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLInputElement | null>(null);
   
   // #2. 검색결과 저장용 state 선언
   //  - 검색결과를 저장할 state를 선언하세요.
@@ -26,17 +26,15 @@ function BoardSearch({list}: {list: typeof boardList}) {
   // - 필터링 결과는 2번 검색결과 저장용 state의 state변경함수를 통하여 저장합니다.
   // - 검색결과가 존재하지 않거나, 입력한 검색어가 비어있는 경우 null값을 저장합니다.
   const onSearchHandler = (e:React.FormEvent) =>{
-    e.preventDefault();
-    const keyWord = keywordRef.current?.value?.trim();
+    const searchValue = searchRef.current?.value;
 
-    if(!keyWord){
-        alert("입력해라");
-        setResult(null);
-        return;
+    if(searchValue){
+      const filteredList = list.filter((board)=> board.boardTitle.includes(searchValue));
+      setResult(filteredList)
+    }else{
+      setResult(null);
     }
-    const found = list.filter((item) => item.boardTitle.includes(keyWord));
-    setResult(found.length > 0 ? found : null);
-  };
+  }
   
   // #4. 
   return (
@@ -45,26 +43,28 @@ function BoardSearch({list}: {list: typeof boardList}) {
         <h2>실습문제 4 : 게시판 검색</h2>
         <input type="text" 
         placeholder="검색어를 입력하세요."
-        ref={keywordRef}
+        ref={searchRef}
         />
         <button onClick={onSearchHandler}>검색</button>
       </form>
 
       <div style={{ marginTop: '20px' }}>
         <h3>검색 결과</h3>
-         {  
-            result && result.length > 0 ? (
-              <ul>
-                {result.map((item) => (
-                  <li key={item.boardNo}>
-                    <strong>{item.boardTitle}</strong> - {item.boardWriter} ({item.boardDate})
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div>검색결과가 없습니다.</div>
-            )
-          }
+         {
+          result && result.length > 0 ? (
+            result.map((board)=>{
+              return(
+                <ul key={board.boardNo}>
+                  <li><strong>번호 : </strong>{board.boardNo}</li>
+                  <li><strong>제목 : </strong>{board.boardTitle}</li>
+                  <li><strong>작성자 : </strong>{board.boardWriter}</li>
+                  <li><strong>작성일 : </strong>{board.boardDate}</li>
+                </ul>
+              )
+            })
+          ) : <p style={{color:'red'}}>검색 결과가 없습니다</p>
+
+         }
       </div>
     </>
   );

@@ -1,0 +1,72 @@
+/* ============================= */
+/* BoardList 스타일 */
+/* ============================= */
+.title-board {
+    color: darkgreen;
+    font-size: 24px;
+    text-align: center;
+    background-color: #e0f2f1;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.board-list {
+    font-size: 18px;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ============================= */
+/* UserList 스타일 */
+/* ============================= */
+.title-user {
+    color: #2c3e50;
+    font-size: 22px;
+    text-align: left;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #2c3e50;
+}
+
+.user-list {
+    font-size: 18px;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ============================= */
+/* 공통 스타일 */
+/* ============================= */
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-item {
+    font-size: 18px;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.highlight {
+    background-color: #fff3cd;
+}
+
+.hoverable:hover {
+    background-color: #f0f0f0;
+}
+
+/* 나이 강조 */
+.age {
+    font-weight: bold;
+    color: #e67e22;
+}
+
+/* 작성자 스타일 */
+.writer {
+    font-style: italic;
+    color: #16a085;
+}
