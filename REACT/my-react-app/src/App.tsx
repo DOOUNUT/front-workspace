@@ -18,8 +18,16 @@ import BoardList from './practice/2.BoardList'
 import Header from './02._react_advanced/05_Router'
 import NestedRoute from './02._react_advanced/06_Nested_Route'
 import { UserDetail, UserList, VariableRoute } from './02._react_advanced/07_Variable_Route'
+import ContextApi from './03.global.context/1.context/Context'
+import Counter from './03.global.context/2.Redux/pages/Counter'
+import { useSelector } from 'react-redux'
+import type { RootState } from './03.global.context/2.Redux/store/store'
+import TodoList from './03.global.context/2.Redux/pages/TodoList'
 
 function App() {
+
+  const counter = useSelector((state:RootState)=>state.counter)
+
   return (
     <>
       {/* <Component/> */}
@@ -36,6 +44,7 @@ function App() {
         {/* <AxiosGet/>
        <AxiosPost/> */}
        <Header/>
+       현재 counter : {counter.value}
        <Routes>
         <Route path='/' element={<div>메인페이지</div>} />
         <Route path='/useEffect' element={<UseEffectHook/>}/>
@@ -48,7 +57,9 @@ function App() {
           <Route path='user/:id' element={<UserDetail/>} />
           <Route path='' element={<UserList/>}/>
         </Route>
-
+        <Route path='/context' element={<ContextApi/>}/>
+        <Route path='/counter' element={<Counter/>}/>
+        <Route path='/redux' element={<TodoList/>}/>
 
         <Route path='*' element={<div>
           <h1 style={{color:'red'}}>잘못된 페이지입니다</h1>
@@ -79,6 +90,15 @@ function App() {
           </li>
           <li>
             <Link to="/variable-route">Variable Route</Link>
+          </li>
+          <li>
+            <Link to="/context">Context</Link>
+          </li>
+          <li>
+            <Link to="/counter">Counter</Link>
+          </li>
+          <li>
+            <Link to="/redux">Redux</Link>
           </li>
         </nav>
     </>

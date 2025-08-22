@@ -1,7 +1,7 @@
-import {  useQuery } from "@tanstack/react-query";
+import {  useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import RadioGroup from "../components/RadioGroup";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, type FormEvent } from "react";
 import { initMenu, type Menu, type MenuUpdate } from "../type/menu";
 import axios from "axios";
 import useInput from "../hooks/useInput";
@@ -12,22 +12,22 @@ const MenuEdit = () => {
     // 요구사항
     // 1. 현재 메뉴 정보에 맞는 데이터를 서버에서 읽어온 후 , 폼에 바인딩한다.(useEffect+useQuery 사용)
 
+      const {id} = useParams();
     const navigate = useNavigate();
-    const {id} = useParams();
-    const {data,isLoading,isError,error} = useQuery<Menu>({
-        queryKey: ['menu',id],
-        queryFn: () => axios.get("http://localhost:8081/api/menus"+id)
-        .then(res => res.data),
+
+    // 1. 현재 메뉴 정보에 맞는 데이터를 서버에서 읽어온 후 , 폼에 바인딩한다.(useEffect+useQuery 사용)
+    const {data, isLoading, isError, error} = useQuery<Menu>({
+        queryKey : ['menu',id] , 
+        queryFn : () => axios.get("http://localhost:8081/api/menus/"+id).then(res => res.data),
         staleTime : 1000 * 60
     })
 
     if(isError){
-        navigate("/menus",{state:{flash:'존재하지 않는 메뉴입니다'}})
+        navigate("/menus",{state:{flash:'존재하지 않는 메뉴입니다.'}});
         return;
     }
-    const [newMenus,handleInputChange,resetMenu,setNewMenus] = useInput<MenuUpdate>(initMenu);
-
-    useEffect(()=>{
+    const [newMenus, handleInputChange, resetMenu, setNewMenus] = useInput<MenuUpdate>(initMenu);
+    useEffect(()=> {
         if(data){
             setNewMenus(data);
         }
@@ -41,6 +41,9 @@ const MenuEdit = () => {
     //    - 모든 필드는 반드시 입력되어야 한다. 
     //    - price는 0이상 이어야 한다.
     //    - 유효성 검사 실패시 경고창(allert)을 통해 경고 메세지를 출력한다.
+
+
+
     // 5. 유효성 검사 통과시 서버에 수정요청을 보낸다(useMutation 사용)
     // 6. 수정 완료 후 상세 페이지로 이동시키고, 수정완료 메세지를 출력한다.
     // 7. 중복 제출을 방지하기 위해 제출이 진행되는 동안은 버튼을 비활성화 시킨다.
@@ -77,8 +80,34 @@ const MenuEdit = () => {
     //     }
     //     mutation.mutate(newEdit);
     // }
+    
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn : (newMenu:MenuUpdate) => axios.put("http://localhost:8081/api/menus/"+id,newMenu),
+        onSuccess : () => {
+            queryClient.invalidateQueries({queryKey:['menu',id]});
+            queryClient.invalidateQueries({queryKey:['menus']})
+            
+            navigate(`/menus/${id}`,{state:{flash:'메뉴 수정이 완료되었습니다.'}})
+        }
+    });
 
+    const updateMenu = (e:FormEvent) => {
+        e.preventDefault();
+        if(newMenus.restaurant  ==''|| newMenus.name == ''){
+            alert('모든 필드를 입력하시요')
+            return;
+        }
+        mutation.mutate(newMenus);
+    }
 
+    if(mutation.isPending){
+        return <div>로등중</div>
+    }
+
+    if(mutation.isError){
+        return <div className="alert alert-danger">{mutation.error.message}</div>
+    }
  
 
 
@@ -86,7 +115,7 @@ const MenuEdit = () => {
         <>
             <div className="menu-test">
                 <h4>메뉴 수정하기(PUT)</h4>
-                <form id="menuEnrollFrm">
+                <form id="menuEnrollFrm" onSubmit={updateMenu}>
                     <input type="text" value={newMenus.restaurant} onChange={handleInputChange} name="restaurant" placeholder="음식점" className="form-control" />
                     <input type="text" value={newMenus.name} onChange={handleInputChange} name="name" placeholder="메뉴" className="form-control" />
                     <input type="number" value={newMenus.price} onChange={handleInputChange} name="price" placeholder="가격" className="form-control"/>
@@ -100,7 +129,7 @@ const MenuEdit = () => {
                         <RadioGroup id="get-mild" value="mild" name="taste" checked={newMenus.taste == 'mild'} onChange={handleInputChange} label="순한맛" />
                     </div>
                     <br />
-                    <input type="submit" className="btn btn-block btn-outline-success btn-send" value="수정" />
+                    <input type="submit" className="btn btn-block btn-outline-success btn-send" value="수정" disabled={mutation.isPending} />
                 </form>
             </div>
         </>
