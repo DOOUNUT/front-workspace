@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import type { Menu } from "../type/menu";
+import { getMenu } from "../api/menuApi";
 
 export const MenuDetail = () => {
 
@@ -77,8 +78,7 @@ export const MenuDetail = () => {
 
     const {data:menu , isLoading , isError, error} = useQuery<Menu>({
         queryKey: ['menu',id], //캐시 구분용 키
-        queryFn : () => axios.get(`http://localhost:8081/api/menus/${id}`)
-        .then(res => res.data),
+        queryFn : () => getMenu((Number(id))),
         staleTime : 1000 * 60, //Fresh유지시간
         gcTime : 1000 * 60 *5, //캐시메모리 저장시간
         enabled: true //초기 실행 여부

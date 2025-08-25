@@ -5,6 +5,7 @@ import { useEffect, type FormEvent } from "react";
 import { initMenu, type Menu, type MenuUpdate } from "../type/menu";
 import axios from "axios";
 import useInput from "../hooks/useInput";
+import { getMenu , updateMenu as updateMenuApi } from "../api/menuApi";
 
 
 const MenuEdit = () => {
@@ -18,7 +19,7 @@ const MenuEdit = () => {
     // 1. 현재 메뉴 정보에 맞는 데이터를 서버에서 읽어온 후 , 폼에 바인딩한다.(useEffect+useQuery 사용)
     const {data, isLoading, isError, error} = useQuery<Menu>({
         queryKey : ['menu',id] , 
-        queryFn : () => axios.get("http://localhost:8081/api/menus/"+id).then(res => res.data),
+        queryFn : () => getMenu(Number(id)),
         staleTime : 1000 * 60
     })
 
@@ -83,7 +84,7 @@ const MenuEdit = () => {
     
     const queryClient = useQueryClient();
     const mutation = useMutation({
-        mutationFn : (newMenu:MenuUpdate) => axios.put("http://localhost:8081/api/menus/"+id,newMenu),
+        mutationFn : (newMenu:MenuUpdate) => updateMenuApi(Number(id),newMenu),
         onSuccess : () => {
             queryClient.invalidateQueries({queryKey:['menu',id]});
             queryClient.invalidateQueries({queryKey:['menus']})

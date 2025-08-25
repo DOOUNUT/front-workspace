@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css'
 import { useState } from 'react';
+import axios, { AxiosError } from 'axios';
+import { useDispatch } from 'react-redux';
+import { loginSucess } from '../../features/authSlice';
 
 export default function Login() {
 
@@ -11,8 +14,91 @@ export default function Login() {
     // 요청 상태
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    const dispatch = useDispatch();
+
     const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if(!email.trim() || !password.trim){
+            setError("이메일과 비밀번호를 모두 입력하세요")
+            return;
+        }
+        setLoading(true);
+        setError("");
+
+        axios.post("http://localhost:8081/api/auth/login",{email,password})
+        .then(res => {
+            console.log(res);
+
+            
+                     /*
+                    #1. JWT 저장위치
+                     - JWT토큰은 클라이언트의 브라우저에서 관리해야하는 데이터이며 API요청에 사용되는 중요한 데이터.
+                     - AccessToken은 메모리에만 보관하고 Refresh Token은 쿠키(http-only)에 보관
+
+                     1) localStroage
+                     - 브라우저의 로컬 저장소, 브라우저가 종료되어도 데이터가 유지된다.
+                     - 손쉬운 기능 구현시에는 잠깐 사용하지만, xss공격에 취약하다.
+                     - 따라서 jwt와 같은 토큰을 관리하기 적합하지 않다.
+
+                     2) sessionStorage
+                     - 탭단위 세션 저장소로 탭을 닫으면 데이터도 삭제된다.
+                     - localstorage처럼 xss공격에 매우 취약하다
+                     
+                     3) 쿠키
+                     - 쿠키는 특정 도메인의 경로에 지정된 시간동안 저장되는 데이터.
+                     - 쿠키는 HTTP통신시 항상 자동으로 전달된다
+                     - 기본 쿠키는 js로 접근하여 탈취될 수 있으나, http-only로 설정된 쿠키는 js로 제어가 불가능하다.(xss에서 안전)
+                     - csrf공격에 취약하기 때문에 csrf방어용 코드가 필요.
+
+                     4) 리액트의 메모리에 보관(리덕스)
+                     - 리덕스에 보관시 메모리에만 저장되며, 새로고침시 데이터가 소멸한다.
+                     - xss공격의 위험이 존재하긴 하나 유지시간이 굉장히 짧기 때문에 공격자체를 최소화 할 수 있다.
+                     - 단, 새로고침시 데이터가 소실되기 때문에 인증 유지를 위한 토큰재발급 기능이 필요하다.
+                    
+                    #2. AccessToken을 Cookie에서 관리하지 않는 이유
+                     1. API유연성 문제
+                     2. CORS설정 문제
+                     3. 토큰만료처리 
+                */
+               dispatch(loginSucess(res.data));
+               navigate("/home",{state:{falsh:"로그인 성공"}});
+        })
+
+        .catch( (err:AxiosError) => {
+            if(err.response?.status === 404){
+                const doSingUp = confirm("등록된 계정이 없습니다. 현재 입력한 이메일/비밀번호로 회원가입 할까요?");
+
+                if(!doSingUp){
+                    setError("계정을 다시 확인해주세요");
+                    setLoading(false);
+                    return;
+                }
+                //자동 회원가입 요청
+                axios.post("http://localhost:8081/api/auth/signUp",{email,password})
+                .then (res => {
+                    console.log(res)
+                    dispatch(loginSucess(res.data));
+                    navigate("/home",{state:{falsh:"로그인 성공"}});
+                })
+                .catch( err => {
+                    setError("회원가입에 실패헀습니다. 나중에 다시 실행해 주세요");
+                }).finally(() =>{
+                    setLoading(false);
+                })
+
+            }
+            else if(err.response?.status === 401){
+                setError("비밀번호가 잘못되었습니다.");
+            }else{
+                setError("로그인 처리 중 오류가 발생했습니다.");
+            }
+        })
+        .finally(()=>{
+            setLoading(false);
+        })
     };
+
     // 소셜 로그인은 백엔드 OAuth 엔드포인트로 리다이렉트
     const handleKakaoLogin = () => {
     };
